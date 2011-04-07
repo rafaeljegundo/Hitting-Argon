@@ -11,12 +11,14 @@ Upgrades ao problema (pontos a adicionar resolvida a primeira aproximação):
 2)	Há um campo eléctrico uniforme aplicado.
 3)	Electrões em vez de iões a serem lançados e uma secção eficaz mais realista que terá de ser tratada pelo métodos numéricos aprendidos.
 """
-
 $c = 299792458
+$pi = Math::PI
 i = 0
-a = 2
+a = 10
 Energia_limiar = 1E3
-Step = 1
+Step = 0.00001
+
+lambda = 2.36E-9
 
 class Ion
   attr_accessor :x, :y, :energy, :vx, :vy
@@ -27,37 +29,47 @@ class Ion
     @vy = 0 # c
     @vx = Math.sqrt(1E9*2*@mass) # c
     @energy = 1E9 # eV
+    @collisioncounter = 0
   end
   def colides
-    #TBD - Placeholder for the collision aftermath
-    @energy = @energy - @energy*0.1
-    @vx -= @vx*0.1  
+    @collisioncounter +=1
+    
+    # ângulo de colisão
+    teta = rand*2*$pi
+    teta1 = Math.atan(Math.sin(teta)/(1+Math.cos(teta)))
+    teta2 = 0.5*($pi-teta)
+    
+    # velocidade
+    @vi = Math.hypot(@vx,@vy)
+    @vf = @vi*(1/Math.sqrt(1+(Math.sin(teta1)**2)/(Math.sin(teta2)**2)))
+    @vx = @vf*Math.cos(teta1)
+    @vy = @vf*Math.sin(teta1)
+        
+    # energia
+    @energy = @energy*0.5 # 0.5 é o valor espectável.
   end
   def inspect
     "The ion is at #{@x}, #{@y} with an energy of #{@energy} and a velocity of #{@vx}, #{@vy}"
   end
   def register
-    $data << [@x, @y, @energy, @vx, @vy]
+    $data << [@x, @y, @energy, @vx, @vy, @collisioncounter]
     rescue
-    $data = [[@x, @y, @energy, @vx, @vy]]
-  end
-  def findAr
-    #TBD - Placeholder for the collision probability
-    rand >0.80
+    $data = [[@x, @y, @energy, @vx, @vy, @collisioncounter]]
   end
 end
       
 while i<a
   subject = Ion.new
-  p subject
   while subject.energy > Energia_limiar
+    lastpositionx = subject.x
+    lastpositiony = subject.y
     subject.x = subject.vx*Step + subject.x
     subject.y = subject.vy*Step + subject.y
-    if subject.findAr
+    distpercorrida = Math.sqrt((subject.x-lastpositionx)**2 + (subject.y-lastpositiony)**2)
+    if rand < (distpercorrida/lambda)*0.5
       subject.colides
-      puts 'HIT'
     end
-    p subject
+    #p subject
   end
   subject.register
   i += 1
@@ -65,5 +77,10 @@ end
 
 #output data
 
-$data.each{|a| puts "#{a[0]}, #{a[1]}, #{a[2]}, #{a[3]}, #{a[4]}"}
+$data.each{|a| puts "distance: #{Math.hypot(a[0],a[1])}, #{a[2]}, #{a[3]}, #{a[4]}, Number of collisions: #{a[5]}"}
+
+numbers = "0  0 0 0 0 \n"
+$data.each{|a| (numbers << " #{Math.hypot(a[0],a[1])}, #{a[2]}, #{a[3]}, #{a[4]} \n")}
+
+File.open('data.txt', 'w') {|f| f.puts numbers}
 
