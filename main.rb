@@ -11,6 +11,7 @@ Upgrades ao problema (pontos a adicionar resolvida a primeira aproximação):
 2)	Há um campo eléctrico uniforme aplicado.
 3)	Electrões em vez de iões a serem lançados e uma secção eficaz mais realista que terá de ser tratada pelo métodos numéricos aprendidos.
 """
+
 $c = 299792458
 $pi = Math::PI
 i = 0
@@ -80,7 +81,9 @@ end
 $data.each{|a| puts "distance: #{Math.hypot(a[0],a[1])}, #{a[2]}, #{a[3]}, #{a[4]}, Number of collisions: #{a[5]}"}
 
 numbers = "0  0 0 0 0 \n"
-$data.each{|a| (numbers << " #{Math.hypot(a[0],a[1])}, #{a[2]}, #{a[3]}, #{a[4]} \n")}
+$data.each{|a| (numbers << "#{Math.hypot(a[0],a[1])} \t #{a[2]} \t #{a[3]} \t #{a[4]} \n")}
 
 File.open('data.txt', 'w') {|f| f.puts numbers}
+
+#Next: alínea a) Os átomos do meio têm uma velocidade normal com média de 3/2KT
 
