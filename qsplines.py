@@ -24,8 +24,8 @@ def tridiagonal(a,b,c,v):
 	x = np.zeros(n)
 	x[-1] = v[-1]/b[-1]
 
-	print x,n
-	print len(x), len(v), len(c), len(b)
+	#print x,n
+	#print len(x), len(v), len(c), len(b)
 	
 	for i in range(n-2,-1,-1):
 	    x[i] = (v[i]-c[i]*x[i+1])/b[i]
@@ -37,18 +37,25 @@ def splinefun(x,y,f,h,xr):
 	yr = []
 	n = len(f)
 	pontos = len(xr)
-	print len(h), len(f), len(x), len(y),n
-	print len(xr), pontos
 	
 	for p in range(pontos):
 			for a in range(n-1):
 				if x[a] <= xr[p] and x[a+1] >= xr[p]:
-					print a,p, x[a], xr[p], x[a+1]
-					yr.append( \
-						(f[a]/(6*h[a]))*(x[a+1]-xr[p])**3 +\
-						(f[a+1]/(6*h[a]))*(xr[p]-x[a])**3	+\
-						((y[a+1]/h[a])-((f[a+1]*h[a])/6))*(xr[p]-x[a]) +\
-						((y[a]/h[a])-(((f[a]*h[a])/6))*(x[a+1]-xr[a])))
+					#ai = (1/6)*((f[a+1]-f[a])/h[a])
+					#bi = f[a]/2
+					#ci = (f[a+1]-f[a])/h[a] - (h[a]*f[a+1] + 2*h[a]*f[a])/6
+					#try:
+						#di = yr[-1]
+					#except:
+						#print "one"
+						#di = 0
+					c = y[a+1]/h[a] - (h[a]/6)*f[a+1]
+					d = y[a]/h[a] - (h[a]/6)*f[a]
+					yr.append((f[a]/(6*h[a]))*(x[a+1]-xr[p])**3 +\
+						(f[a+1]/(6*h[a]))*(xr[p]-x[a])**3 +\
+						c*(xr[p]-x[a]) +\
+						d*(x[a+1]-xr[p]))
+					print a,p, x[a], xr[p], x[a+1], yr[p], y[a]		
 				else:
 					continue
 			
@@ -68,7 +75,8 @@ def main():
 	u = []
 	h = []
 	v = []
-	n = len(data) - 2
+	
+	n = len(data)
 	
 	# Defining x and y vectors from original data
 	for pair in data:
@@ -77,25 +85,21 @@ def main():
 
 	# Calcular u, h e v
 	
-	i = 0
-	while i < n:
+	for i in range(n-1):
 		h.append(x[i+1]-x[i])
-		i += 1
 		
-	i = 0
-	while i < n: 
-		try:
-			u.append(2*(h[i] + h[i-1]))
-		except IndexError:
-			u.append(0)
-		i+=1
-
-	i = 0 
-	while i < n: 
-		v.append(((6/h[i])*(y[i+1]-y[i]))-(6/(h[i-1]))*(y[i]-y[i-1]))
-		i += 1
+	for i in range(n-1):
+		u.append(2*(h[i] + h[i-1]))
 	
-	xr = np.linspace(1E-4,50,100)	
+	for i in range(n-1):
+		v.append(((6/h[i])*(y[i+1]-y[i]))-(6/(h[i-1]))*(y[i]-y[i-1]))
+	
+	xr =[]
+	
+	# Interpolating one point between each knott
+	
+	for i in range(len(x)-1):
+		xr.append(x[i]+(x[i+1]-x[i])/2)
 	
 	f = tridiagonal(h,u,h,v)
 	
@@ -114,10 +118,7 @@ def main():
 			
 	r.close()
 		
-	# Another hack. The problem is on yr calculus.
-	print len(x), len(y)
-	print len(xr[:88]), len(yr)
-	plt.plot(x,y,'ro',xr[:88],yr,'bo')
+	plt.plot(x,y,'ro',xr,yr,'bo')
 	plt.show()
 	
 	pass
