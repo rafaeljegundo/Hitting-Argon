@@ -24,8 +24,6 @@ def tridiagonal(a,b,c,v):
 	x = np.zeros(n)
 	x[-1] = v[-1]/b[-1]
 
-	#print x,n
-	#print len(x), len(v), len(c), len(b)
 	
 	for i in range(n-2,-1,-1):
 	    x[i] = (v[i]-c[i]*x[i+1])/b[i]
@@ -36,9 +34,8 @@ def splinefun(x,y,f,h,xr):
 	
 	yr = []
 	n = len(f)
-	pontos = len(xr)
 	
-	for p in range(pontos):
+	for p in range(len(xr)-1):
 			for a in range(n-1):
 				if x[a] <= xr[p] and x[a+1] >= xr[p]:
 					#ai = (1/6)*((f[a+1]-f[a])/h[a])
@@ -117,8 +114,8 @@ def main():
 			break
 			
 	r.close()
-		
-	plt.plot(x,y,'ro',xr,yr,'bo')
+	
+	plt.plot(x,y,'ro',xr[:-1],yr,'bo') # HAS BUG -1
 	plt.show()
 	
 	pass
