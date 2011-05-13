@@ -5,6 +5,8 @@ main.py
 
 Created by Rafael Jegundo on 2011-05-11.
 Copyright (c) 2011 SMMC. All rights reserved.
+
+Notes: the step needs to be very small, due to the small free mean path. Final results for traveled distance should be ~1E-6
 """
 
 from random import random
