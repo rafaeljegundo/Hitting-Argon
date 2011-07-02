@@ -83,7 +83,7 @@ class Particle:
 		self.vi1 = hypot(self.vx,self.vy)
 		
 		if collision_type == "2D-inerte gas":
-		
+			# Válido para electrões ??
 			teta = 2*pi*random()
 			teta1 = math.atan(sin(teta)/(1+cos(teta)))
 			teta2 = 0.5*(pi-teta)
@@ -91,30 +91,29 @@ class Particle:
 			self.vf1 = self.vi1/sqrt(1+((sin(teta1)**2)/(sin(teta2)**2)))
 
 		elif collision_type == "2D-3/2KTEnergy gas":
-			velo = sqrt(((3/2)*K*T)/(2*self.mass))
-			vxrandom = sqrt(random()*velo)
-			vyrandom = sqrt(velo**2-vxrandom**2)
-
-			gas = Particle(self.tipe, self.x,self.y,vxrandom,vyrandom, (3/2)*K*T)
-			vi2 = hypot(gas.vx, gas.vy)		
-		
-		
-			a = 1 - (sin(teta1)*sin(teta1))/(sin(teta2)*sin(teta2)) 
-			b = 2 * (vi2*sin(teta1)*sin(teta))/(sin(teta2)*sin(teta2)) 
-			c = ((vi2**2)*sin(teta)**2)/sin(teta2)
 			
-			try:
-				self.vf1 = (-b + math.sqrt(b*b-4*a*c))/(2*a) 
-			except: 
-				try: 
-					self.vf1 = (-b - math.sqrt(b*b-4*a*c))/(2*a)
-				except:
-					self.vf1 = self.vi1*(1/sqrt(1+(sin(teta1)**2)/(sin(teta2)**2)))
-					print "used fail-safe. It shouldn't work this way  :\ To Be corrected"
+			teta = 2*pi*random()
+			teta1 = math.atan(sin(teta)/(1+cos(teta)))
+			teta2 = 0.5*(pi-teta)
+			
+			direction = random()*180
 
+			gas = Particle("Argon+", self.x, self.y, direction, (3/2)*K*T)
+			
+			vi2 = hypot(gas.vx, gas.vy)		
+
+			a = 1 + (sin(teta1)/sin(teta2))**2 
+			b = 2*vi2*sin(teta1)/sin(teta2)**2*sin(teta) # Será teta? 
+			c = -self.vi1**2 + vi2**2 *(-1 + ( sin(teta)/sin(teta2)))
+			
+			self.vf1 = (-b + math.sqrt(b*b-4*a*c))/(2*a)
+			
 		elif collision_type == "3D-3/2KTEnergy gas":
+			
 			print "TBI"
+			
 		else:
+			
 			print "unknown collision type"
 			sys.exit()
 		
@@ -140,8 +139,9 @@ def ionTrip(subject, step, la, f, eField = (0.0,0.0)):
 		distpercorrida = sqrt((subject.x-lastpositionx)**2 + (subject.y-lastpositiony)**2)
 		
 		# Collision condition: when distance traveled converges to la, collision probability converges to 1.
-		if random() < distpercorrida/la : 
-			print "colision:%s\t%s\t%s\t%s\t%s"% (subject.x, subject.y, hypot(subject.x,subject.y), subject.energy, subject.collisioncounter)
+		# Deverá evoluir para colisão nula
+		
+		if random() < distpercorrida/la*0.5 :
 			subject.colides()	
 			subject.log()
 		if subject.energy < 1E3:
@@ -156,16 +156,13 @@ def simulate_collisions(step, free_mean_path,electric_field, ions, particle_type
 	y_initial = 0
 	direction = 0 # Degrees between ion direction and the positive X axe.
 	
-	print "Error1: 2D collisions in gas with static Argon Particles gives only one collision. Velocity calculations must be wrong"
-
 	f = file('collisionslog.txt','w')
 	
 	f.write("%s\t%s\t%s\t%s\t%s\n" % ("x", "y", "distance", "energy", "collision"))
 
 	i = 0	
 	while i < ions:
-		subject = Particle(particle_type,x_initial, y_initial,direction,energy)
-		print "new subject"
+		subject = Particle(particle_type, x_initial, y_initial,direction,energy)
 		ionTrip(subject, step, free_mean_path, f, electric_field) # add eletric field here. default set to 0
 		i += 1
 	
@@ -180,16 +177,16 @@ if __name__ == '__main__':
 	particle_type = "Argon+"
 	
 	# Electric field module for x and y directions
-	electric_field = (1,0) 
+	electric_field = (0,0) 
 
 	# Measure of effective section
 	free_mean_path = 2.36E-9 
 	
 	# Must be very small to be reasonable, according to the free mean path
-	step = 0.0000000001
+	step = 0.00000000001
 	
 	# Number of ions to be launched
-	ions = 10
+	ions = 20
 
 	simulate_collisions(step, free_mean_path, electric_field, ions, particle_type)
 
