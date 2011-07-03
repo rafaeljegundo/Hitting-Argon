@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 """
-main.py
+collisions2D.py
 
 Created by Rafael Jegundo on 2011-05-11.
 Copyright (c) 2011 SMMC. All rights reserved.
@@ -35,8 +35,7 @@ Test and END.
 """
 
 from random import random
-from numpy import pi, sin, cos, sqrt, hypot
-import math
+from numpy import pi, sin, cos, sqrt, hypot, arctan
 import sys
 from time import time
 
@@ -52,11 +51,10 @@ class Particle:
 	
 	"""Ion attributes: position (x,y), velocity (vx,vy) and energy"""
 	
-	def __init__(self, particle_type, x, y, direction, energy):
+	def __init__(self, particle_type, energy, x, y, direction):
 		
 		argonMass = 931.46E6/(c**2)
 		electronMass = 9.1093821E-31
-		
 		
 		if particle_type == "Argon+":		
 			self.mass = argonMass
@@ -83,9 +81,9 @@ class Particle:
 		self.vi1 = hypot(self.vx,self.vy)
 		
 		if collision_type == "2D-inerte gas":
-			# Válido para electrões ??
+			# Válido para electrões ????????????????????????
 			teta = 2*pi*random()
-			teta1 = math.atan(sin(teta)/(1+cos(teta)))
+			teta1 = arctan(sin(teta)/(1+cos(teta)))
 			teta2 = 0.5*(pi-teta)
 
 			self.vf1 = self.vi1/sqrt(1+((sin(teta1)**2)/(sin(teta2)**2)))
@@ -93,12 +91,12 @@ class Particle:
 		elif collision_type == "2D-3/2KTEnergy gas":
 			
 			teta = 2*pi*random()
-			teta1 = math.atan(sin(teta)/(1+cos(teta)))
+			teta1 = arctan(sin(teta)/(1+cos(teta)))
 			teta2 = 0.5*(pi-teta)
 			
 			direction = random()*180
 
-			gas = Particle("Argon+", self.x, self.y, direction, (3/2)*K*T)
+			gas = Particle("Argon+", (3/2)*K*T, self.x, self.y, direction)
 			
 			vi2 = hypot(gas.vx, gas.vy)		
 
@@ -106,7 +104,7 @@ class Particle:
 			b = 2*vi2*sin(teta1)/sin(teta2)**2*sin(teta) # Será teta? 
 			c = -self.vi1**2 + vi2**2 *(-1 + ( sin(teta)/sin(teta2)))
 			
-			self.vf1 = (-b + math.sqrt(b*b-4*a*c))/(2*a)
+			self.vf1 = (-b + sqrt(b*b-4*a*c))/(2*a)
 			
 		elif collision_type == "3D-3/2KTEnergy gas":
 			
@@ -127,8 +125,10 @@ class Particle:
 		self.state = map(str,[self.x, self.y, self.energy, self.vx, self.vy, self.collisioncounter])
 		return
 
-def ionTrip(subject, step, la, f, eField = (0.0,0.0)):
+def ionTrip2D(subject, step, la, f, eField = (0.0,0.0)):
+	
 	acceleration = (q*eField[0]/subject.mass,q*eField[1]/subject.mass)	
+	
 	while True:
 		lastpositionx  = subject.x  
 		lastpositiony  = subject.y
@@ -147,8 +147,9 @@ def ionTrip(subject, step, la, f, eField = (0.0,0.0)):
 		if subject.energy < 1E3:
 			f.write("%s\t%s\t%s\t%s\t%s\n" % (subject.x, subject.y, hypot(subject.x,subject.y), subject.energy, subject.collisioncounter))
 			return
+			
 	
-def simulate_collisions(step, free_mean_path,electric_field, ions, particle_type):
+def simulate_collisions2D(step, free_mean_path,electric_field, ions, particle_type):
 
 	# Some Default values
 	energy = 1E9
@@ -156,22 +157,27 @@ def simulate_collisions(step, free_mean_path,electric_field, ions, particle_type
 	y_initial = 0
 	direction = 0 # Degrees between ion direction and the positive X axe.
 	
-	f = file('collisionslog.txt','w')
+	f = file('collisionslog2D.txt','w')
 	
 	f.write("%s\t%s\t%s\t%s\t%s\n" % ("x", "y", "distance", "energy", "collision"))
 
 	i = 0	
 	while i < ions:
-		subject = Particle(particle_type, x_initial, y_initial,direction,energy)
-		ionTrip(subject, step, free_mean_path, f, electric_field) # add eletric field here. default set to 0
+		subject = Particle(particle_type, energy, x_initial, y_initial, direction)
+		ionTrip2D(subject, step, free_mean_path, f, electric_field) # add eletric field here. default set to 0
 		i += 1
 	
 	f.close()
 	
 	pass
+	
+
 
 
 if __name__ == '__main__':
+	print u"Falta a probabilidade de colisão nula"
+
+	print u"Note-se que no caso de electrões, e = -q"
 	
 	# The options are "Argon+" and "Electron"
 	particle_type = "Argon+"
@@ -188,5 +194,6 @@ if __name__ == '__main__':
 	# Number of ions to be launched
 	ions = 20
 
-	simulate_collisions(step, free_mean_path, electric_field, ions, particle_type)
-
+	print "2D Simulation"
+	simulate_collisions2D(step, free_mean_path, electric_field, ions, particle_type)
+	
