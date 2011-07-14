@@ -43,7 +43,6 @@ def splinefun(x,y,f,h,xr):
 					
 					#print p,a,x[a], xr[p], x[a+1]
 					
-					
 					c = y[a+1]/h[a] - (h[a]/6)*f[a+1]
 					
 					d = y[a]/h[a] - (h[a]/6)*f[a]
@@ -106,7 +105,7 @@ if __name__ == '__main__':
 	
 	# Just a test
 	
-	f = open('data_acquired.txt','r')
+	f = open('cross_section.txt','r')
 	
 	data = []
 	
