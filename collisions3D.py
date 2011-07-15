@@ -65,10 +65,6 @@ class Particle:
 		
 		gas_atom = Particle("Argon+", (3/2)*K*T, self.x, self.y, self.z, vxg, vyg, vzg)
 		
-		#q_gas = sin(gas_atom.phi)*cos(gas_atom.phi)
-		#u_gas = sin(gas_atom.phi)*sin(gas_atom.phi)
-		#s_gas = cos(gas_atom.phi)
-		
 		# Conversão para o sistema do centro de massa
 		self.vfx = self.vx - gas_atom.vx
 		self.vfy = self.vy - gas_atom.vy
@@ -84,24 +80,12 @@ class Particle:
 		gama2 = self.mass/(self.mass+gas_atom.mass)
 		gama1 = gas_atom.mass/(self.mass+gas_atom.mass)
 
-		
-		#vcmx = gama2*self.vf*q # mas estes dois ultimos termos == vx !!! 
-		#vcmy = gama2*self.vf*u
-		#vcmz = gama2*self.vf*s
-		
 		ro = sqrt(1-s**2)
 		
-		# 
 		phi = gas_atom.phi
 		teta = gas_atom.teta
 		
 		# Cosenos directores ' - colisao
-#		ql = (sin(self.phi)*cos(self.teta)*s*q-sin(self.phi)*sin(self.teta)*u)/ (ro + cos(self.phi)*q)
-#		ul = (sin(self.phi)*cos(self.teta)*s*u-sin(self.phi)*sin(self.teta)*q)/ (ro + cos(self.phi)*u)
-#		sl = -sin(self.phi)*sin(self.teta)*ro + cos(self.phi)*s
-
-		# OR
-		
 		ql = (sin(phi)*cos(teta)*s*q-sin(phi)*sin(teta)*u)/ (ro + cos(phi)*q)
 		ul = (sin(phi)*cos(teta)*s*u-sin(phi)*sin(teta)*q)/ (ro + cos(phi)*u)
 		sl = -sin(phi)*sin(teta)*ro + cos(phi)*s

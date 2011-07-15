@@ -134,7 +134,6 @@ def ionTrip2D(subject, step, la, f, eField = (0.0,0.0)):
 		subject.x += subject.vx*step
 		subject.y += subject.vy*step
 		distpercorrida = sqrt((subject.x-lastpositionx)**2 + (subject.y-lastpositiony)**2)
-		
 		# Collision condition: when distance traveled converges to la, collision probability converges to 1.
 		
 		if subject.particle_type == "Electron":
@@ -193,7 +192,7 @@ if __name__ == '__main__':
 	particle_type = "Argon+"
 	
 	# Electric field module for x and y directions
-	electric_field = (0,0) 
+	electric_field = (-0.001,0) 
 
 	# Measure of effective section
 	cross_section = []
@@ -230,7 +229,6 @@ if __name__ == '__main__':
 	ions = 1000
 			
 	print "2D Simulation"
-	print "the collision calculations only work for two bodies with the same mass. To be corrected, for the sake of electrons."
 	import profile
 	profile.run('simulate_collisions2D(step, free_mean_path, electric_field, ions, particle_type)')
 	
