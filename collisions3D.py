@@ -62,6 +62,7 @@ class Particle:
 		vxg = random()
 		vyg = random()
 		vzg = random()
+		
 		gas_atom = Particle("Argon+", (3/2)*K*T, self.x, self.y, self.z, vxg, vyg, vzg)
 		
 		#q_gas = sin(gas_atom.phi)*cos(gas_atom.phi)
@@ -80,8 +81,8 @@ class Particle:
 		s = self.vfz/self.vf
 		
 		# Qual o m e M?
-		gama1 = self.mass/(self.mass+gas_atom.mass)
-		gama2 = gas_atom.mass/(self.mass+gas_atom.mass)
+		gama2 = self.mass/(self.mass+gas_atom.mass)
+		gama1 = gas_atom.mass/(self.mass+gas_atom.mass)
 
 		
 		#vcmx = gama2*self.vf*q # mas estes dois ultimos termos == vx !!! 
@@ -155,7 +156,7 @@ def ionTrip3D(subject, step, la, f, eField = (0.0, 0.0, 0.0)):
 				lastpositionz  = subject.z
 				
 			if subject.energy < 1E3:
-				f.write("%s\t%s\t%s\t%s\t%s\t%s\n" % (subject.x, subject.y,  subject.z, sqrt((subject.x-lastpositionx)**2 + (subject.y-lastpositiony)**2 + (subject.z-lastpositionz)**2), subject.energy, subject.collisioncounter))
+				f.write("%s\t%s\t%s\t%s\t%s\t%s\n" % (subject.x, subject.y,  subject.z, sqrt((subject.x)**2 + (subject.y)**2 + (subject.z)**2), subject.energy, subject.collisioncounter))
 				return
 
 		elif subject.particle_type == "Argon+":
@@ -192,6 +193,7 @@ def simulate_collisions3D(step, free_mean_path,electric_field, ions, particle_ty
 
 	i = 0	
 	while i < ions:
+		print i
 		subject = Particle(particle_type, energy, x_initial, y_initial, z_initial, vx_initial, vy_initial, vz_initial)
 		ionTrip3D(subject, step, free_mean_path, f, electric_field) # add eletric field here. default set to 0
 		i += 1
@@ -231,7 +233,6 @@ if __name__ == '__main__':
 				b = 6.72E-1
 				sigma = a/(energy**(-b))
 			
-			print 0.5/(sigma*n)
 			return 0.5/(sigma*n)
 
 	else:

@@ -75,8 +75,25 @@ class Particle:
 			vi2 = hypot(gas.vx, gas.vy)		
 
 			a = 1 + (sin(teta1)/sin(teta2))**2 
-			b = 2*vi2*sin(teta1)/sin(teta2)**2*sin(teta) 
-			c = -self.vi1**2 - (vi2**2)*(-1 + ( sin(teta)/sin(teta2)))
+			b = (2*vi2*sin(teta1)*sin(teta))/sin(teta2)**2 
+			c = -self.vi1**2 +(vi2**2)*(-1 + (sin(teta)/sin(teta2)))
+			
+			self.vf1 = (-b + sqrt(b*b-4*a*c))/(2*a)
+			
+		elif collision_type == "different mass":
+			
+			direction = random()*pi
+
+			gas = Particle("Argon+", (3/2)*K*T, self.x, self.y, direction)
+			
+			vi2 = hypot(gas.vx, gas.vy)		
+
+			m2 = self.mass
+			m1 = gas.mass
+			
+			a = m1 + m2*(sin(teta1)/sin(teta2))**2 
+			b = (2*vi2*sin(teta1)*sin(teta)*m2)/sin(teta2)**2 
+			c = -m1*self.vi1**2 + (vi2**2)*m2*(-1 + ( sin(teta)/sin(teta2)))
 			
 			self.vf1 = (-b + sqrt(b*b-4*a*c))/(2*a)
 			
@@ -123,22 +140,22 @@ def ionTrip2D(subject, step, la, f, eField = (0.0,0.0)):
 		if subject.particle_type == "Electron":
 			
 			if random() < (distpercorrida/la(subject.energy))*0.5 :
-				subject.colides()	# Change collisions conditions here
+				subject.colides("different mass", "f(v)")	# Change collisions conditions here
 				lastpositionx = subject.x  
 				lastpositiony = subject.y
 				
-			if subject.energy < 1E3:
+			if subject.energy < 1E3 :
 				f.write("%s\t%s\t%s\t%s\t%s\n" % (subject.x, subject.y, hypot(subject.x,subject.y), subject.energy, subject.collisioncounter))
 				return
 
 		elif subject.particle_type == "Argon+":
 
 			if random() < (distpercorrida/la)*0.5 :
-				subject.colides("0 Energy gas", "half") 	# Change collisions conditions here
+				subject.colides("3/2KT Energy gas", "f(v)") 	# Change collisions conditions here
 				lastpositionx = subject.x  
 				lastpositiony = subject.y
 				
-			if subject.energy < 1E3:
+			if subject.energy < 1E3 :
 				f.write("%s\t%s\t%s\t%s\t%s\n" % (subject.x, subject.y, hypot(subject.x,subject.y), subject.energy, subject.collisioncounter))
 				return
 		else:
@@ -149,7 +166,7 @@ def ionTrip2D(subject, step, la, f, eField = (0.0,0.0)):
 def simulate_collisions2D(step, free_mean_path,electric_field, ions, particle_type):
 
 	# Some Default values
-	energy = 1E9 #eV
+	energy = 1E6 #eV
 	x_initial = 0
 	y_initial = 0
 	direction = 0 # Degrees between ion/electron direction and the positive X axe.
@@ -160,6 +177,7 @@ def simulate_collisions2D(step, free_mean_path,electric_field, ions, particle_ty
 
 	i = 0	
 	while i < ions:
+		print i
 		subject = Particle(particle_type, energy, x_initial, y_initial, direction)
 		ionTrip2D(subject, step, free_mean_path, f, electric_field) # add eletric field here. default set to 0
 		i += 1
