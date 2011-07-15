@@ -127,7 +127,7 @@ def ionTrip3D(subject, step, la, f, eField = (0.0, 0.0, 0.0)):
 		subject.x = subject.vx*step + subject.x 
 		subject.y = subject.vy*step + subject.y
 		subject.z = subject.vz*step + subject.z
-
+		
 		distpercorrida = sqrt((subject.x-lastpositionx)**2 + (subject.y-lastpositiony)**2 + (subject.z-lastpositionz)**2)
 
 		# Collision condition: when distance traveled converges to la, collision probability converges to 1.
@@ -150,7 +150,7 @@ def ionTrip3D(subject, step, la, f, eField = (0.0, 0.0, 0.0)):
 				lastpositionx = subject.x  
 				lastpositiony = subject.y
 				lastpositionz = subject.z
-				
+								
 			if subject.energy < 1E3:
 				f.write("%s\t%s\t%s\t%s\t%s\t%s\n" % (subject.x, subject.y, subject.z, sqrt((subject.x)**2 + (subject.y)**2 + (subject.z)**2), subject.energy, subject.collisioncounter))
 				return
@@ -161,7 +161,7 @@ def ionTrip3D(subject, step, la, f, eField = (0.0, 0.0, 0.0)):
 def simulate_collisions3D(step, free_mean_path,electric_field, ions, particle_type):				
 	
 	# Some Default values
-	energy = 1E9
+	energy = 1E6
 	x_initial = 0
 	y_initial = 0
 	z_initial = 0
